@@ -1,0 +1,37 @@
+{
+  "//": "Configuration MCP du projet. Serveurs activés au démarrage de Claude Code dans ce répertoire.",
+  "//docs": "https://docs.claude.com/en/docs/claude-code/mcp",
+  "mcpServers": {
+    "perplexity": {
+      "//": "Perci — recherche web sourcée. Officiel Perplexity.",
+      "command": "npx",
+      "args": ["-y", "@perplexity-ai/mcp-server"],
+      "env": {
+        "PERPLEXITY_API_KEY": "${PERPLEXITY_API_KEY}"
+      }
+    },
+    "openai-bridge": {
+      "//": "Gepetto — pont vers OpenAI/GPT via Composio (à activer en remplaçant l'URL et la clé).",
+      "//alternative": "Tu peux aussi héberger ton propre serveur MCP qui expose un outil ask_gepetto.",
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@composio/mcp", "openai"],
+      "env": {
+        "COMPOSIO_API_KEY": "${COMPOSIO_API_KEY}",
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}"
+      },
+      "disabled": true
+    },
+    "gemini-bridge": {
+      "//": "Gemina — pont vers Google Gemini. À activer si tu disposes d'une clé.",
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@composio/mcp", "gemini"],
+      "env": {
+        "COMPOSIO_API_KEY": "${COMPOSIO_API_KEY}",
+        "GEMINI_API_KEY": "${GEMINI_API_KEY}"
+      },
+      "disabled": true
+    }
+  }
+}

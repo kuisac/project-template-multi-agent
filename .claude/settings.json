@@ -1,0 +1,29 @@
+{
+  "//": "Configuration Claude Code spécifique au projet.",
+  "//docs": "https://docs.claude.com/en/docs/claude-code/settings",
+  "hooks": {
+    "SubagentStop": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/log-subagent.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/post-write.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": []
+  }
+}
