@@ -10,28 +10,27 @@
         "PERPLEXITY_API_KEY": "${PERPLEXITY_API_KEY}"
       }
     },
-    "openai-bridge": {
-      "//": "Gepetto — pont vers OpenAI/GPT via Composio (à activer en remplaçant l'URL et la clé).",
-      "//alternative": "Tu peux aussi héberger ton propre serveur MCP qui expose un outil ask_gepetto.",
+    "gepetto": {
+      "//": "Gepetto — serveur MCP Python fait maison. Lance .claude/OtherAI/gpt/mcp_server.py.",
+      "//setup": "pip install -r .claude/OtherAI/gpt/requirements.txt && setx OPENAI_API_KEY sk-...",
+      "//model": "Pour changer le modèle par défaut : setx GEPETTO_MODEL gpt-4o",
       "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "@composio/mcp", "openai"],
+      "command": "python",
+      "args": [".claude/OtherAI/gpt/mcp_server.py"],
       "env": {
-        "COMPOSIO_API_KEY": "${COMPOSIO_API_KEY}",
         "OPENAI_API_KEY": "${OPENAI_API_KEY}"
-      },
-      "disabled": true
+      }
     },
-    "gemini-bridge": {
-      "//": "Gemina — pont vers Google Gemini. À activer si tu disposes d'une clé.",
+    "gemina": {
+      "//": "Gemina — serveur MCP Python fait maison. Lance .claude/OtherAI/gemini/mcp_server.py.",
+      "//setup": "pip install -r .claude/OtherAI/gemini/requirements.txt && setx GEMINI_API_KEY AIza...",
+      "//model": "Pour changer le modèle par défaut : setx GEMINA_MODEL gemini-2.5-pro",
       "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "@composio/mcp", "gemini"],
+      "command": "python",
+      "args": [".claude/OtherAI/gemini/mcp_server.py"],
       "env": {
-        "COMPOSIO_API_KEY": "${COMPOSIO_API_KEY}",
         "GEMINI_API_KEY": "${GEMINI_API_KEY}"
-      },
-      "disabled": true
+      }
     }
   }
 }

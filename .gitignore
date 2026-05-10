@@ -29,6 +29,7 @@ build/
 # Claude Code (laisse tout le reste de .claude/ versionné)
 # .claude/agents/, /commands/, /hooks/, /shared/, /OtherAI/ et settings.json
 # DOIVENT être versionnés pour que l'équipe partage la même config IA.
-# Seuls les caches locaux éventuels sont ignorés :
+# Seuls les secrets locaux et caches sont ignorés :
+.claude/settings.local.json
 .claude/cache/
 .claude/local/
