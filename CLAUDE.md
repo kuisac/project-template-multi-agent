@@ -8,14 +8,24 @@
 
 Garde-le concis. Tout détail volumineux vit dans `.claude/shared/` ou `doc/`.
 
+> **Zones générées.** Les blocs encadrés par une paire de commentaires HTML
+> `wizard:begin` / `wizard:end` sont régénérés par `/init-project` depuis
+> `.claude/wizard/catalog.json`. Tu peux les éditer à la main, mais une
+> reconfiguration les écrasera. Tout ce qui est **hors** de ces balises est la
+> doctrine du projet : le wizard n'y touche pas.
+
 ---
 
 ## 1. Identité du projet
 
+<!-- wizard:begin identity -->
 - **Nom du projet** : `<À renseigner>`
+- **Description** : `<À renseigner — une phrase : ce que fait le produit>`
 - **Stack principale** : `<À renseigner — ex. Python/FastAPI, TypeScript/Next.js…>`
 - **Phase actuelle** : `<discovery | conception | build | run>`
+- **Langue des livrables** : `<français | anglais>`
 - **Cycle de travail** : itérations courtes (1 à 2 semaines) avec revue d'équipe IA à chaque fin d'itération.
+<!-- wizard:end identity -->
 
 ---
 
@@ -83,6 +93,7 @@ tu peux faire toi-même — déléguer serait disproportionné.
 
 ## 3. La structure de l'arborescence
 
+<!-- wizard:begin tree -->
 ```
 /                             racine du projet
 ├── CLAUDE.md                 ← ce fichier
@@ -95,6 +106,7 @@ tu peux faire toi-même — déléguer serait disproportionné.
 │   ├── hooks/                  ← scripts shell (PostToolUse, Stop, …)
 │   ├── shared/                 ← team-charter, templates, glossaire de l'équipe
 │   │   └── templates/            ← ADR, rapport d'itération, …
+│   ├── wizard/                 ← catalogue des composants + état d'initialisation
 │   └── OtherAI/                ← briefs pour IA externes (non Claude Code)
 │       ├── gpt/                  ← Gepetto
 │       ├── gemini/               ← Gemina
@@ -112,6 +124,7 @@ tu peux faire toi-même — déléguer serait disproportionné.
     └── reviews/                ← rapports de revue par itération
         └── external/             ← contributions Gepetto/Gemina/Perci
 ```
+<!-- wizard:end tree -->
 
 ---
 
@@ -124,6 +137,7 @@ Chaque agent porte un **prénom** et un **rôle**. Sa fiche complète est dans
 
 #### Cœur de l'équipe
 
+<!-- wizard:begin team-table -->
 | Prénom | Rôle | Posture | Modèle |
 |--------|------|---------|--------|
 | **Pilote** | Chef de projet, orchestrateur (toi par défaut) | Arbitre | opus |
@@ -135,14 +149,17 @@ Chaque agent porte un **prénom** et un **rôle**. Sa fiche complète est dans
 | **Critik** | Reviewer code | **Contradicteur** | sonnet |
 | **Sentinel** | Auditeur sécurité | **Contradicteur** | **opus** |
 | **Devil** | Avocat du diable produit | **Contradicteur** | **opus** |
+<!-- wizard:end team-table -->
 
 #### Spécialistes (à solliciter selon besoin)
 
+<!-- wizard:begin specialists-table -->
 | Prénom | Rôle | Posture | Modèle |
 |--------|------|---------|--------|
 | **Data** | DBA & data architect — relationnel (PostgreSQL/MySQL) + time-series (TimescaleDB) | Constructeur | sonnet |
 | **Ergo** | Expert UX/UI & accessibilité — web (WCAG) **et** mobile (HIG/Material) | Mixte (constructeur + contradicteur) | sonnet |
 | **Métier** | Expert domaine **industrie / IoT** (mesures, capteurs, équipements, normes) | Constructeur | sonnet |
+<!-- wizard:end specialists-table -->
 
 > **Choix des modèles** : Opus pour Pilote (tient le contexte global et arbitre),
 > Sentinel (un audit sécu raté coûte cher) et Devil (les contradictions produit
@@ -207,6 +224,7 @@ Voir `.claude/shared/team-charter.md` pour les règles précises du débat.
 - Toute exposition de surface (endpoint, dépendance, secret, IO externe) déclenche
   son intervention sans qu'on ait à le demander.
 
+<!-- wizard:begin specialists-rules -->
 ### 5.6. Quand solliciter les spécialistes (Data, Ergo, Métier)
 
 Les spécialistes ne sont pas appelés sur tout. Pilote les convoque quand le sujet
@@ -233,6 +251,7 @@ relève clairement de leur expertise :
 
 Ces spécialistes participent aussi aux cycles `/debate` quand le sujet relève
 de leur domaine (cf. `team-charter.md`).
+<!-- wizard:end specialists-rules -->
 
 ---
 
@@ -240,22 +259,27 @@ de leur domaine (cf. `team-charter.md`).
 
 ### Commandes générales (cœur d'équipe)
 
+<!-- wizard:begin commands-table -->
 | Commande | Quand l'utiliser |
 |----------|------------------|
 | `/team-status` | Diagnostic de l'équipe (à lancer en début de session) |
+| `/init-project` | (Re)configurer l'équipe et l'arborescence depuis le catalogue |
 | `/debate <sujet>` | Cycle adversarial complet |
 | `/draft-us <besoin>` | Rédiger une US challengée par Devil |
 | `/review-changes` | Revue multi-agents des changements en cours |
 | `/audit-security <périmètre>` | Audit sécurité Sentinel + Critik |
 | `/iteration-report <NN>` | Rapport consolidé fin d'itération |
+<!-- wizard:end commands-table -->
 
 ### Commandes spécialistes (à solliciter au besoin)
 
+<!-- wizard:begin specialists-commands-table -->
 | Commande | Quand l'utiliser |
 |----------|------------------|
 | `/data-review <périmètre>` | Data audite la couche de persistance (schéma, requêtes, index, migrations) |
 | `/ux-review <feature>` | Ergo audite l'UX d'un écran ou parcours, avec contre-vérif Devil + Specia |
 | `/domain-check <sujet>` | Métier valide qu'une US ou un design respecte les règles métier réelles |
+<!-- wizard:end specialists-commands-table -->
 
 ---
 
@@ -273,6 +297,9 @@ de leur domaine (cf. `team-charter.md`).
 
 ## 8. Pour démarrer une session
 
+0. **Projet jamais initialisé** (l'identité ci-dessus est encore `<À renseigner>`) :
+   lance `/init-project` avant toute autre chose. Le wizard renseigne l'identité,
+   constitue l'équipe et élague ce dont le projet n'a pas besoin.
 1. Lance `/team-status` pour voir l'état de l'équipe.
 2. Lis `doc/reviews/` pour récupérer le contexte de l'itération en cours.
 3. Si la demande utilisateur est ambiguë, reformule avant d'agir.

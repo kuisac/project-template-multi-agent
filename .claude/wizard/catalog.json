@@ -1,0 +1,584 @@
+{
+  "$schema": "./catalog.schema.json",
+  "//": "Catalogue des composants du template. Source de vérité unique de /init-project.",
+  "//extend": "Pour ajouter un composant ou un profil, voir .claude/wizard/README.md.",
+  "//mcp": "Les composants kind=mcp ne sont volontairement inclus dans aucun profil sauf full : /init-project les traite à part (étape 4), car ils dépendent de clés d'API et non du type de projet.",
+  "catalogVersion": "1.0.0",
+
+  "tags": {
+    "core": "Socle indispensable au fonctionnement de l'équipe adversariale.",
+    "quality": "Qualité de code, revue, dette technique.",
+    "test": "Tests, couverture, QA.",
+    "security": "Sécurité applicative, menaces, conformité.",
+    "product": "Valeur produit, scope, backlog, user stories.",
+    "docs": "Documentation, ADR, synthèses, rapports.",
+    "ux": "Expérience utilisateur, accessibilité, interfaces.",
+    "data": "Modèle de données, persistance, requêtes, time-series.",
+    "domain-industry": "Domaine industrie / IoT / OT (capteurs, SCADA, IEC 62443).",
+    "architecture": "Décisions structurantes, ADR, design système.",
+    "external-ai": "Agents IA non-Anthropic pilotés via MCP.",
+    "observability": "Traçabilité des sessions et des sub-agents."
+  },
+
+  "components": [
+    {
+      "id": "agent.pilote",
+      "kind": "agent",
+      "name": "Pilote",
+      "path": ".claude/agents/pilote.md",
+      "role": "Chef de projet, orchestrateur",
+      "posture": "arbitre",
+      "model": "opus",
+      "tags": ["core"],
+      "requires": [],
+      "removable": false,
+      "summary": "Produit des plans d'orchestration isolés. Le rôle est aussi tenu par la session principale via CLAUDE.md."
+    },
+    {
+      "id": "agent.archi",
+      "kind": "agent",
+      "name": "Archi",
+      "path": ".claude/agents/archi.md",
+      "role": "Architecte logiciel",
+      "posture": "constructeur",
+      "model": "sonnet",
+      "tags": ["core", "architecture"],
+      "requires": [],
+      "removable": true,
+      "summary": "Décisions d'architecture, ADR, choix de dépendances, patterns d'intégration."
+    },
+    {
+      "id": "agent.specia",
+      "kind": "agent",
+      "name": "Specia",
+      "path": ".claude/agents/specia.md",
+      "role": "Analyste fonctionnel / PO",
+      "posture": "constructeur",
+      "model": "sonnet",
+      "tags": ["core", "product", "docs"],
+      "requires": [],
+      "removable": true,
+      "summary": "Specs fonctionnelles, user stories, critères d'acceptation, backlog."
+    },
+    {
+      "id": "agent.codie",
+      "kind": "agent",
+      "name": "Codie",
+      "path": ".claude/agents/codie.md",
+      "role": "Développeur",
+      "posture": "constructeur",
+      "model": "sonnet",
+      "tags": ["core"],
+      "requires": [],
+      "removable": false,
+      "summary": "Implémentation, correction de bugs, refactoring dans src/."
+    },
+    {
+      "id": "agent.testor",
+      "kind": "agent",
+      "name": "Testor",
+      "path": ".claude/agents/testor.md",
+      "role": "Ingénieur test & QA",
+      "posture": "constructeur",
+      "model": "sonnet",
+      "tags": ["core", "test"],
+      "requires": [],
+      "removable": true,
+      "summary": "Conception de tests, analyse de couverture, détection de trous et de flakiness."
+    },
+    {
+      "id": "agent.scribe",
+      "kind": "agent",
+      "name": "Scribe",
+      "path": ".claude/agents/scribe.md",
+      "role": "Documentaliste / synthèse",
+      "posture": "constructeur",
+      "model": "sonnet",
+      "tags": ["core", "docs"],
+      "requires": [],
+      "removable": true,
+      "summary": "Rédaction des ADR finaux, rapports d'itération, README, glossaire, changelog."
+    },
+    {
+      "id": "agent.critik",
+      "kind": "agent",
+      "name": "Critik",
+      "path": ".claude/agents/critik.md",
+      "role": "Reviewer code",
+      "posture": "contradicteur",
+      "model": "sonnet",
+      "tags": ["core", "quality"],
+      "requires": [],
+      "removable": false,
+      "summary": "Revue de code adversariale en lecture seule, chasse aux code smells et à la dette."
+    },
+    {
+      "id": "agent.sentinel",
+      "kind": "agent",
+      "name": "Sentinel",
+      "path": ".claude/agents/sentinel.md",
+      "role": "Auditeur sécurité",
+      "posture": "contradicteur",
+      "model": "opus",
+      "tags": ["core", "security"],
+      "requires": [],
+      "removable": true,
+      "summary": "Audit sécurité, threat modeling, CVE, secrets, surface d'attaque, AuthN/AuthZ."
+    },
+    {
+      "id": "agent.devil",
+      "kind": "agent",
+      "name": "Devil",
+      "path": ".claude/agents/devil.md",
+      "role": "Avocat du diable produit",
+      "posture": "contradicteur",
+      "model": "opus",
+      "tags": ["core", "product"],
+      "requires": [],
+      "removable": true,
+      "summary": "Challenge de la valeur, du scope, du ROI. Premortem et scénarios alternatifs."
+    },
+    {
+      "id": "agent.data",
+      "kind": "agent",
+      "name": "Data",
+      "path": ".claude/agents/data.md",
+      "role": "DBA & data architect",
+      "posture": "constructeur",
+      "model": "sonnet",
+      "tags": ["data"],
+      "requires": [],
+      "removable": true,
+      "summary": "Modèle de données, schéma, index, migrations, contrats d'événements, time-series."
+    },
+    {
+      "id": "agent.ergo",
+      "kind": "agent",
+      "name": "Ergo",
+      "path": ".claude/agents/ergo.md",
+      "role": "Expert UX/UI & accessibilité",
+      "posture": "mixte",
+      "model": "sonnet",
+      "tags": ["ux"],
+      "requires": [],
+      "removable": true,
+      "summary": "Parcours utilisateur, accessibilité WCAG, design system, web et mobile (HIG/Material)."
+    },
+    {
+      "id": "agent.metier",
+      "kind": "agent",
+      "name": "Métier",
+      "path": ".claude/agents/metier.md",
+      "role": "Expert domaine industrie / IoT",
+      "posture": "constructeur",
+      "model": "sonnet",
+      "tags": ["domain-industry"],
+      "requires": [],
+      "removable": true,
+      "summary": "Unités physiques, capteurs, calibration, workflows production, ISO/IEC, sûreté (SIL/PL)."
+    },
+
+    {
+      "id": "command.team-status",
+      "kind": "command",
+      "name": "/team-status",
+      "path": ".claude/commands/team-status.md",
+      "tags": ["core", "observability"],
+      "requires": [],
+      "removable": false,
+      "summary": "Diagnostic de l'équipe IA : agents disponibles, dette de doc, dernier débat."
+    },
+    {
+      "id": "command.debate",
+      "kind": "command",
+      "name": "/debate",
+      "path": ".claude/commands/debate.md",
+      "tags": ["core", "architecture", "product"],
+      "requires": ["agent.critik"],
+      "recommends": ["agent.archi", "agent.sentinel", "agent.devil", "agent.scribe"],
+      "removable": true,
+      "summary": "Cycle adversarial complet (proposition → contradiction → arbitrage) sur une décision structurante."
+    },
+    {
+      "id": "command.draft-us",
+      "kind": "command",
+      "name": "/draft-us",
+      "path": ".claude/commands/draft-us.md",
+      "tags": ["product"],
+      "requires": ["agent.specia", "agent.devil"],
+      "removable": true,
+      "summary": "Specia rédige une user story, immédiatement challengée par Devil."
+    },
+    {
+      "id": "command.review-changes",
+      "kind": "command",
+      "name": "/review-changes",
+      "path": ".claude/commands/review-changes.md",
+      "tags": ["core", "quality"],
+      "requires": ["agent.critik"],
+      "recommends": ["agent.sentinel", "agent.testor"],
+      "removable": true,
+      "summary": "Revue multi-agents (Critik + Sentinel + Testor) des changements en cours."
+    },
+    {
+      "id": "command.audit-security",
+      "kind": "command",
+      "name": "/audit-security",
+      "path": ".claude/commands/audit-security.md",
+      "tags": ["security"],
+      "requires": ["agent.sentinel"],
+      "recommends": ["agent.critik"],
+      "removable": true,
+      "summary": "Audit sécurité approfondi par Sentinel sur un périmètre, avec rapport actionnable."
+    },
+    {
+      "id": "command.iteration-report",
+      "kind": "command",
+      "name": "/iteration-report",
+      "path": ".claude/commands/iteration-report.md",
+      "tags": ["docs"],
+      "requires": ["agent.scribe"],
+      "recommends": ["agent.testor", "agent.critik", "agent.sentinel", "agent.devil"],
+      "removable": true,
+      "summary": "Rapport consolidé de fin d'itération (tests, code, sécu, produit, doc)."
+    },
+    {
+      "id": "command.data-review",
+      "kind": "command",
+      "name": "/data-review",
+      "path": ".claude/commands/data-review.md",
+      "tags": ["data"],
+      "requires": ["agent.data"],
+      "removable": true,
+      "summary": "Data audite la couche de persistance : schéma, requêtes, index, migrations."
+    },
+    {
+      "id": "command.ux-review",
+      "kind": "command",
+      "name": "/ux-review",
+      "path": ".claude/commands/ux-review.md",
+      "tags": ["ux"],
+      "requires": ["agent.ergo"],
+      "recommends": ["agent.devil", "agent.specia"],
+      "removable": true,
+      "summary": "Ergo audite l'UX d'un écran ou d'un parcours, avec contre-vérification."
+    },
+    {
+      "id": "command.domain-check",
+      "kind": "command",
+      "name": "/domain-check",
+      "path": ".claude/commands/domain-check.md",
+      "tags": ["domain-industry"],
+      "requires": ["agent.metier"],
+      "removable": true,
+      "summary": "Métier valide qu'une US ou un design respecte les règles métier réelles du domaine."
+    },
+    {
+      "id": "command.init-project",
+      "kind": "command",
+      "name": "/init-project",
+      "path": ".claude/commands/init-project.md",
+      "tags": ["core"],
+      "requires": [],
+      "removable": true,
+      "selfRemoveAfterInit": true,
+      "summary": "Le wizard lui-même. Peut être retiré une fois le projet initialisé."
+    },
+
+    {
+      "id": "hook.log-subagent",
+      "kind": "hook",
+      "name": "Journal des sub-agents",
+      "path": ".claude/hooks/log-subagent.sh",
+      "event": "SubagentStop",
+      "matcher": ".*",
+      "tags": ["observability"],
+      "requires": [],
+      "enabledByDefault": true,
+      "removable": true,
+      "summary": "Journalise chaque fin de sub-agent dans runtime/agent-logs/."
+    },
+    {
+      "id": "hook.post-write",
+      "kind": "hook",
+      "name": "Garde-fou d'écriture",
+      "path": ".claude/hooks/post-write.sh",
+      "event": "PostToolUse",
+      "matcher": "Write|Edit",
+      "tags": ["docs", "quality"],
+      "requires": [],
+      "enabledByDefault": true,
+      "removable": true,
+      "summary": "Signale les écritures dans doc/architecture/ qui ne suivent pas la convention ADR-NNN-*.md."
+    },
+    {
+      "id": "hook.session-end",
+      "kind": "hook",
+      "name": "Bilan de fin de session",
+      "path": ".claude/hooks/session-end.sh",
+      "event": "Stop",
+      "matcher": ".*",
+      "tags": ["docs", "observability"],
+      "requires": [],
+      "enabledByDefault": false,
+      "removable": true,
+      "summary": "Affiche en fin de session les ADR restés au statut Proposé. Non branché par défaut."
+    },
+
+    {
+      "id": "mcp.perplexity",
+      "kind": "mcp",
+      "name": "Perci (Perplexity)",
+      "server": "perplexity",
+      "paths": [".claude/OtherAI/perplexity"],
+      "envVars": ["PERPLEXITY_API_KEY"],
+      "tags": ["external-ai", "security"],
+      "requires": [],
+      "enabledByDefault": false,
+      "removable": true,
+      "summary": "Recherche web sourcée, veille techno, CVE. Serveur MCP officiel Perplexity via npx."
+    },
+    {
+      "id": "mcp.gepetto",
+      "kind": "mcp",
+      "name": "Gepetto (OpenAI / GPT)",
+      "server": "gepetto",
+      "paths": [".claude/OtherAI/gpt"],
+      "envVars": ["OPENAI_API_KEY"],
+      "tags": ["external-ai"],
+      "requires": [],
+      "enabledByDefault": false,
+      "removable": true,
+      "summary": "Second avis algorithmique, brainstorming d'API. Serveur MCP Python local."
+    },
+    {
+      "id": "mcp.gemina",
+      "kind": "mcp",
+      "name": "Gemina (Google Gemini)",
+      "server": "gemina",
+      "paths": [".claude/OtherAI/gemini"],
+      "envVars": ["GEMINI_API_KEY"],
+      "tags": ["external-ai"],
+      "requires": [],
+      "enabledByDefault": false,
+      "removable": true,
+      "summary": "Analyse de gros corpus, contexte long. Serveur MCP Python local."
+    },
+
+    {
+      "id": "doc.compliance-iec62443",
+      "kind": "doc",
+      "name": "Conformité IEC 62443",
+      "path": "doc/functional/compliance/iec-62443.md",
+      "tags": ["domain-industry", "security"],
+      "requires": [],
+      "removable": true,
+      "summary": "Grille de conformité cybersécurité OT. Pertinent uniquement en contexte industriel."
+    },
+    {
+      "id": "doc.equipment-template",
+      "kind": "doc",
+      "name": "Fiche équipement",
+      "path": "doc/functional/equipment/_template.md",
+      "tags": ["domain-industry"],
+      "requires": [],
+      "removable": true,
+      "summary": "Template de description d'un équipement industriel instrumenté."
+    },
+    {
+      "id": "doc.threat-model",
+      "kind": "doc",
+      "name": "Threat model",
+      "path": "doc/architecture/threat-model.md",
+      "tags": ["security", "architecture"],
+      "requires": [],
+      "removable": true,
+      "summary": "Modèle de menaces à initialiser à la première itération."
+    },
+    {
+      "id": "doc.business-rules",
+      "kind": "doc",
+      "name": "Règles métier",
+      "path": "doc/functional/business-rules.md",
+      "tags": ["product", "docs"],
+      "requires": [],
+      "removable": true,
+      "summary": "Recueil des règles métier faisant foi."
+    },
+    {
+      "id": "doc.glossary",
+      "kind": "doc",
+      "name": "Glossaire",
+      "path": "doc/functional/glossary.md",
+      "tags": ["docs"],
+      "requires": [],
+      "removable": false,
+      "summary": "Glossaire des termes métier, source de vérité du vocabulaire projet."
+    },
+    {
+      "id": "doc.test-policy",
+      "kind": "doc",
+      "name": "Politique de test",
+      "path": "requirements/test-policy.md",
+      "tags": ["test"],
+      "requires": [],
+      "removable": true,
+      "summary": "Seuil de couverture minimal et règles de test à compléter."
+    },
+    {
+      "id": "doc.security-policy",
+      "kind": "doc",
+      "name": "Politique de sécurité",
+      "path": "requirements/security-policy.md",
+      "tags": ["security"],
+      "requires": [],
+      "removable": true,
+      "summary": "Référentiel sécurité visé (OWASP ASVS, niveau) à compléter."
+    },
+
+    {
+      "id": "scaffold.src",
+      "kind": "scaffold",
+      "name": "src/",
+      "path": "src",
+      "tags": ["core"],
+      "requires": [],
+      "removable": false,
+      "summary": "Code applicatif."
+    },
+    {
+      "id": "scaffold.tests",
+      "kind": "scaffold",
+      "name": "tests/",
+      "path": "tests",
+      "tags": ["test"],
+      "requires": [],
+      "removable": true,
+      "summary": "Tests unitaires, intégration, e2e."
+    },
+    {
+      "id": "scaffold.runtime",
+      "kind": "scaffold",
+      "name": "runtime/",
+      "path": "runtime",
+      "tags": ["observability"],
+      "requires": [],
+      "removable": true,
+      "summary": "Artefacts d'exécution : logs de sub-agents, builds locaux. Ignoré par git."
+    },
+    {
+      "id": "scaffold.doc-technical",
+      "kind": "scaffold",
+      "name": "doc/technical/",
+      "path": "doc/technical",
+      "tags": ["docs"],
+      "requires": [],
+      "removable": true,
+      "summary": "Specs techniques détaillées."
+    },
+    {
+      "id": "scaffold.doc-backlog",
+      "kind": "scaffold",
+      "name": "doc/backlog/",
+      "path": "doc/backlog",
+      "tags": ["product"],
+      "requires": [],
+      "removable": true,
+      "summary": "User stories, epics, MoSCoW."
+    },
+    {
+      "id": "scaffold.doc-reviews",
+      "kind": "scaffold",
+      "name": "doc/reviews/",
+      "path": "doc/reviews",
+      "tags": ["docs"],
+      "requires": [],
+      "removable": false,
+      "summary": "Rapports de revue par itération."
+    },
+    {
+      "id": "scaffold.doc-reviews-external",
+      "kind": "scaffold",
+      "name": "doc/reviews/external/",
+      "path": "doc/reviews/external",
+      "tags": ["external-ai"],
+      "requires": [],
+      "removable": true,
+      "summary": "Contributions des agents externes (Gepetto, Gemina, Perci)."
+    }
+  ],
+
+  "profiles": [
+    {
+      "id": "solo",
+      "label": "Solo / léger",
+      "description": "Un développeur seul, projet de taille modeste. Équipe resserrée : construire, relire, tester, documenter. Pas de spécialistes.",
+      "include": [
+        "agent.pilote", "agent.codie", "agent.critik", "agent.testor", "agent.scribe",
+        "command.init-project",
+        "command.team-status", "command.review-changes", "command.iteration-report",
+        "hook.log-subagent", "hook.post-write",
+        "doc.glossary", "doc.test-policy",
+        "scaffold.src", "scaffold.tests", "scaffold.runtime", "scaffold.doc-technical", "scaffold.doc-reviews"
+      ]
+    },
+    {
+      "id": "web-app",
+      "label": "Application web / SaaS",
+      "description": "Produit web ou SaaS avec interface utilisateur, base de données et exposition réseau. Cycle adversarial complet, spécialistes UX et Data.",
+      "include": [
+        "agent.pilote", "agent.archi", "agent.specia", "agent.codie", "agent.testor",
+        "agent.scribe", "agent.critik", "agent.sentinel", "agent.devil",
+        "agent.data", "agent.ergo",
+        "command.init-project",
+        "command.team-status", "command.debate", "command.draft-us", "command.review-changes",
+        "command.audit-security", "command.iteration-report", "command.data-review", "command.ux-review",
+        "hook.log-subagent", "hook.post-write",
+        "doc.threat-model", "doc.business-rules", "doc.glossary", "doc.test-policy", "doc.security-policy",
+        "scaffold.src", "scaffold.tests", "scaffold.runtime",
+        "scaffold.doc-technical", "scaffold.doc-backlog", "scaffold.doc-reviews"
+      ]
+    },
+    {
+      "id": "industrial-iot",
+      "label": "Industrie / IoT",
+      "description": "Systèmes industriels instrumentés : capteurs, télémétrie, SCADA/MES, conformité IEC 62443. Équipe complète, expertise métier activée.",
+      "include": [
+        "agent.pilote", "agent.archi", "agent.specia", "agent.codie", "agent.testor",
+        "agent.scribe", "agent.critik", "agent.sentinel", "agent.devil",
+        "agent.data", "agent.ergo", "agent.metier",
+        "command.init-project",
+        "command.team-status", "command.debate", "command.draft-us", "command.review-changes",
+        "command.audit-security", "command.iteration-report", "command.data-review",
+        "command.ux-review", "command.domain-check",
+        "hook.log-subagent", "hook.post-write", "hook.session-end",
+        "doc.compliance-iec62443", "doc.equipment-template", "doc.threat-model",
+        "doc.business-rules", "doc.glossary", "doc.test-policy", "doc.security-policy",
+        "scaffold.src", "scaffold.tests", "scaffold.runtime",
+        "scaffold.doc-technical", "scaffold.doc-backlog", "scaffold.doc-reviews"
+      ]
+    },
+    {
+      "id": "data-platform",
+      "label": "Plateforme data",
+      "description": "Pipelines, entrepôts, modèles de données au premier plan. Pas d'UI significative, Data devient un rôle central.",
+      "include": [
+        "agent.pilote", "agent.archi", "agent.specia", "agent.codie", "agent.testor",
+        "agent.scribe", "agent.critik", "agent.sentinel", "agent.devil", "agent.data",
+        "command.init-project",
+        "command.team-status", "command.debate", "command.draft-us", "command.review-changes",
+        "command.audit-security", "command.iteration-report", "command.data-review",
+        "hook.log-subagent", "hook.post-write",
+        "doc.threat-model", "doc.business-rules", "doc.glossary", "doc.test-policy", "doc.security-policy",
+        "scaffold.src", "scaffold.tests", "scaffold.runtime",
+        "scaffold.doc-technical", "scaffold.doc-backlog", "scaffold.doc-reviews"
+      ]
+    },
+    {
+      "id": "full",
+      "label": "Complet",
+      "description": "Tout le catalogue. Point de départ pour élaguer soi-même, ou pour un projet qui touche à tout.",
+      "includeAll": true
+    }
+  ]
+}

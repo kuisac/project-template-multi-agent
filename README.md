@@ -1,13 +1,16 @@
+<!-- wizard:begin header -->
 # Project template — équipe IA multi-agents adversariale
 
 > Squelette de projet pour Claude Code optimisé pour la qualité multi-aspect
 > (doc, tests, sécurité, critique produit) via une équipe d'agents qui se
 > challengent en mode adversarial, orchestrée par un chef de projet (Pilote).
+<!-- wizard:end header -->
 
 ---
 
 ## Vue d'ensemble
 
+<!-- wizard:begin tree -->
 ```
 .
 ├── CLAUDE.md                 ← contexte projet + rôle Pilote (lu auto par Claude Code)
@@ -15,11 +18,12 @@
 ├── .mcp.json                 ← serveurs MCP (Perplexity, GPT, Gemini)
 ├── .claude/                  ← TOUT le paramétrage IA, en un seul endroit
 │   ├── settings.json           ← config technique (hooks)
-│   ├── agents/                 ← 9 sub-agents Claude
-│   ├── commands/               ← 6 commandes /slash
+│   ├── agents/                 ← sub-agents Claude (un .md par agent)
+│   ├── commands/               ← commandes /slash
 │   ├── hooks/                  ← scripts shell sur événements
 │   ├── shared/                 ← team-charter, templates ADR/itération, doc agents externes
 │   │   └── templates/
+│   ├── wizard/                 ← catalogue des composants + état d'initialisation
 │   └── OtherAI/                ← briefs pour IA externes (non Claude Code)
 │       ├── gpt/                  ← Gepetto
 │       ├── gemini/               ← Gemina
@@ -37,6 +41,7 @@
     └── reviews/                ← rapports de revue par itération
         └── external/             ← contributions Gepetto/Gemina/Perci
 ```
+<!-- wizard:end tree -->
 
 > **Tout ce qui est IA est dans `.claude/`** — y compris les briefs pour les IA
 > non-Anthropic (GPT/Gemini/Perplexity), regroupés sous `.claude/OtherAI/`.
@@ -46,13 +51,28 @@
 
 ## Démarrage rapide
 
-1. **Cloner ce template** dans un nouveau projet.
-2. **Compléter `CLAUDE.md`** : nom du projet, stack, phase.
-3. **(Optionnel) Activer les MCP** : remplir un `.env` avec `PERPLEXITY_API_KEY`,
-   éventuellement `OPENAI_API_KEY` / `GEMINI_API_KEY`, et activer les serveurs
-   correspondants dans `.mcp.json` (passer `disabled` à `false`).
-4. **Lancer Claude Code** dans le répertoire racine.
-5. **Première commande recommandée** : `/team-status` pour vérifier que tout est branché.
+<!-- wizard:begin quickstart -->
+1. **Cloner ce template** dans un nouveau projet, puis retirer l'historique git
+   du template si tu veux repartir d'un dépôt vierge.
+2. **Lancer Claude Code** dans le répertoire racine.
+3. **Lancer `/init-project`** — le wizard fait le reste :
+   - il renseigne l'identité du projet (nom, stack, phase, description) ;
+   - il te fait choisir un **profil** (solo, web/SaaS, industrie-IoT, data, complet) ;
+   - il te laisse **ajuster à la carte** les agents, commandes et hooks ;
+   - il **supprime** ce que tu n'as pas retenu et régénère `CLAUDE.md`, ce
+     `README.md`, `.claude/settings.json`, `.mcp.json` et la charte d'équipe.
+4. **Définir les variables d'environnement** des serveurs MCP activés
+   (`PERPLEXITY_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY`), puis **redémarrer**
+   Claude Code — `.mcp.json` et `settings.json` ne sont relus qu'au démarrage.
+5. **Première commande** : `/team-status` pour vérifier que tout est branché.
+
+> Le wizard est non destructif tant que tu n'as pas confirmé : `/init-project --dry-run`
+> déroule tout le dialogue et affiche le plan sans rien écrire. `/init-project --check`
+> se contente de valider la cohérence du catalogue.
+>
+> Besoin d'ajouter un agent trois semaines plus tard ? `/init-project --reconfigure`
+> repart de tes réponses précédentes.
+<!-- wizard:end quickstart -->
 
 ---
 
@@ -62,6 +82,7 @@
 
 #### Cœur de l'équipe
 
+<!-- wizard:begin team-table -->
 | Prénom | Rôle | Posture | Modèle |
 |--------|------|---------|--------|
 | **Pilote** | Chef de projet (toi en session normale, ou sub-agent invocable) | Arbitre | opus |
@@ -73,14 +94,17 @@
 | **Critik** | Reviewer code | **Contradicteur** | sonnet |
 | **Sentinel** | Auditeur sécurité | **Contradicteur** | **opus** |
 | **Devil** | Avocat du diable produit | **Contradicteur** | **opus** |
+<!-- wizard:end team-table -->
 
 #### Spécialistes (à solliciter selon besoin)
 
+<!-- wizard:begin specialists-table -->
 | Prénom | Rôle | Posture | Modèle |
 |--------|------|---------|--------|
 | **Data** | DBA — relationnel + time-series IoT | Constructeur | sonnet |
 | **Ergo** | UX/UI — web + mobile (iOS/Android) | Mixte | sonnet |
 | **Métier** | Domaine **industrie / IoT** | Constructeur | sonnet |
+<!-- wizard:end specialists-table -->
 
 ### Agents externes (optionnels)
 
@@ -96,22 +120,27 @@ Détails et briefs dans `.claude/shared/external-agents.md` et `.claude/OtherAI/
 
 ### Cœur d'équipe
 
+<!-- wizard:begin commands-table -->
 | Commande | Quand l'utiliser |
 |----------|------------------|
 | `/team-status` | Diagnostic de l'équipe (à lancer en début de session) |
+| `/init-project` | (Re)configurer l'équipe et l'arborescence depuis le catalogue |
 | `/debate <sujet>` | Cycle adversarial complet sur une décision structurante |
 | `/draft-us <besoin>` | Rédiger une US challengée par Devil |
 | `/review-changes` | Critik + Sentinel + Testor passent sur les changements en cours |
 | `/audit-security <périmètre>` | Sentinel audite, Critik signale les zones opaques |
 | `/iteration-report <NN>` | Rapport consolidé fin d'itération |
+<!-- wizard:end commands-table -->
 
 ### Spécialistes
 
+<!-- wizard:begin specialists-commands-table -->
 | Commande | Quand l'utiliser |
 |----------|------------------|
 | `/data-review <périmètre>` | Data audite la couche de persistance (schéma, requêtes, index) |
 | `/ux-review <feature>` | Ergo audite l'UX d'un parcours, avec contre-vérif Devil + Specia |
 | `/domain-check <sujet>` | Métier valide la conformité métier d'une US ou d'un design |
+<!-- wizard:end specialists-commands-table -->
 
 ---
 
@@ -142,6 +171,14 @@ niveaux de décision déclenchent quel niveau de cycle.
 
 ## Personnaliser
 
+> **Le plus simple : `/init-project --reconfigure`.** Il régénère toutes les
+> zones balisées de façon cohérente. Les manipulations ci-dessous restent
+> valables pour ce que le wizard ne couvre pas.
+
+- **Ajouter un composant au catalogue** : voir `.claude/wizard/README.md`. Tant
+  qu'un agent, une commande ou un hook n'est pas déclaré dans
+  `.claude/wizard/catalog.json`, le wizard l'ignore — il ne le proposera ni ne
+  le supprimera.
 - **Renommer un agent** : édite le `name:` dans son frontmatter ET son fichier.
   Mets à jour les références dans les commandes (`debate.md`, etc.) et dans `CLAUDE.md`.
 - **Ajouter un agent** : copie `.claude/agents/critik.md` (modèle de

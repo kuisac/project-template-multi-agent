@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Catalogue de composants du template multi-agents",
+  "description": "Décrit tout ce que /init-project sait sélectionner, activer ou retirer.",
+  "type": "object",
+  "required": ["catalogVersion", "tags", "components", "profiles"],
+  "additionalProperties": true,
+  "properties": {
+    "catalogVersion": {
+      "type": "string",
+      "description": "Version SemVer du catalogue. À incrémenter à chaque ajout de composant ou de profil.",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "tags": {
+      "type": "object",
+      "description": "Dictionnaire tag -> définition en une phrase. Un composant ne peut porter qu'un tag déclaré ici.",
+      "additionalProperties": { "type": "string" }
+    },
+    "components": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/component" }
+    },
+    "profiles": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/profile" }
+    }
+  },
+  "$defs": {
+    "component": {
+      "type": "object",
+      "required": ["id", "kind", "name", "tags", "summary"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Identifiant unique, conventionnellement '<kind>.<slug>'.",
+          "pattern": "^(agent|command|hook|mcp|doc|scaffold)\\.[a-z0-9-]+$"
+        },
+        "kind": {
+          "type": "string",
+          "description": "Nature du composant. Détermine la façon dont /init-project l'active ou le retire.",
+          "enum": ["agent", "command", "hook", "mcp", "doc", "scaffold"]
+        },
+        "name": { "type": "string", "description": "Nom affiché à l'utilisateur pendant le wizard." },
+        "path": { "type": "string", "description": "Chemin du fichier (ou du dossier pour kind=scaffold), relatif à la racine." },
+        "paths": {
+          "type": "array",
+          "description": "Chemins additionnels retirés avec le composant. Utilisé par kind=mcp pour son dossier OtherAI/.",
+          "items": { "type": "string" }
+        },
+        "role": { "type": "string", "description": "kind=agent : intitulé du rôle dans les tables de CLAUDE.md." },
+        "posture": {
+          "type": "string",
+          "description": "kind=agent : posture dans le cycle adversarial (cf. team-charter.md).",
+          "enum": ["arbitre", "constructeur", "contradicteur", "mixte"]
+        },
+        "model": {
+          "type": "string",
+          "description": "kind=agent : modèle déclaré dans le frontmatter de la fiche.",
+          "enum": ["opus", "sonnet", "haiku", "inherit"]
+        },
+        "event": {
+          "type": "string",
+          "description": "kind=hook : événement Claude Code auquel le script est branché dans settings.json.",
+          "enum": ["PreToolUse", "PostToolUse", "SubagentStop", "Stop", "SessionStart", "UserPromptSubmit", "Notification", "PreCompact"]
+        },
+        "matcher": { "type": "string", "description": "kind=hook : matcher associé à l'événement." },
+        "server": { "type": "string", "description": "kind=mcp : clé du serveur dans mcpServers de .mcp.json." },
+        "envVars": {
+          "type": "array",
+          "description": "kind=mcp : variables d'environnement requises, rappelées à l'utilisateur en fin de wizard.",
+          "items": { "type": "string" }
+        },
+        "tags": {
+          "type": "array",
+          "description": "Tags déclarés dans la section 'tags' racine. Servent au regroupement à la carte.",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "requires": {
+          "type": "array",
+          "description": "Dépendances dures : sélectionner ce composant force la sélection de celles-ci.",
+          "items": { "type": "string" },
+          "default": []
+        },
+        "recommends": {
+          "type": "array",
+          "description": "Dépendances molles : leur absence dégrade le composant sans le casser. /init-project avertit sans forcer.",
+          "items": { "type": "string" },
+          "default": []
+        },
+        "removable": {
+          "type": "boolean",
+          "description": "false = socle, /init-project ne propose jamais de le retirer.",
+          "default": true
+        },
+        "enabledByDefault": {
+          "type": "boolean",
+          "description": "kind=hook et kind=mcp : état par défaut quand le composant est conservé mais pas explicitement activé.",
+          "default": true
+        },
+        "selfRemoveAfterInit": {
+          "type": "boolean",
+          "description": "true = /init-project propose de retirer ce composant une fois l'initialisation terminée.",
+          "default": false
+        },
+        "summary": { "type": "string", "description": "Une phrase affichée dans le dialogue à la carte." }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "kind": { "const": "hook" } }, "required": ["kind"] },
+          "then": { "required": ["event", "path"] }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "mcp" } }, "required": ["kind"] },
+          "then": { "required": ["server"] }
+        },
+        {
+          "if": { "properties": { "kind": { "enum": ["agent", "command", "doc", "scaffold"] } }, "required": ["kind"] },
+          "then": { "required": ["path"] }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "agent" } }, "required": ["kind"] },
+          "then": { "required": ["role", "posture", "model"] }
+        }
+      ]
+    },
+    "profile": {
+      "type": "object",
+      "required": ["id", "label", "description"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "label": { "type": "string", "description": "Libellé proposé dans le choix de profil." },
+        "description": { "type": "string", "description": "Deux phrases max : à qui s'adresse ce profil." },
+        "include": {
+          "type": "array",
+          "description": "Ids de composants sélectionnés. Doit être clos par 'requires' — un profil ne doit jamais inclure un composant sans ses dépendances dures.",
+          "items": { "type": "string" }
+        },
+        "includeAll": {
+          "type": "boolean",
+          "description": "true = tout le catalogue. Exclusif avec 'include'.",
+          "default": false
+        }
+      },
+      "oneOf": [
+        { "required": ["include"] },
+        { "required": ["includeAll"] }
+      ]
+    }
+  }
+}
