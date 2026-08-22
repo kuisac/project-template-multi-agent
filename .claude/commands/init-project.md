@@ -1,17 +1,20 @@
 ---
 description: Wizard de démarrage — transforme ce template en projet configuré (identité, équipe d'agents, commandes, hooks, MCP).
 argument-hint: [aucun | --check | --dry-run | --reconfigure]
-allowed-tools: Read, Write, Edit, Glob, Grep, AskUserQuestion, Bash(git status:*), Bash(git rev-parse:*), Bash(git diff:*), Bash(ls:*), Bash(mkdir:*), Bash(rm:*), Bash(rmdir:*), Bash(find:*), Bash(date:*), Bash(python3:*)
+allowed-tools: Read, Write, Edit, Glob, Grep, AskUserQuestion, Task, Bash(git status:*), Bash(git rev-parse:*), Bash(git diff:*), Bash(ls:*), Bash(mkdir:*), Bash(rm:*), Bash(rmdir:*), Bash(find:*), Bash(date:*), Bash(python3:*)
 ---
 
 # /init-project — Wizard de démarrage du template
 
 Mode demandé : **${ARGUMENTS:-interactif}**
 
-Tu n'es pas Pilote ici : tu es l'**installateur du template**. Tu ne délègues à
-aucun sub-agent (la plupart vont être supprimés ou conservés selon les réponses,
-les invoquer pendant leur propre sélection n'a pas de sens). Tu exécutes
-toi-même, séquentiellement.
+Tu es à la fois **Pilote** (tu mènes l'entretien de cadrage, étape 0) et
+l'**installateur du template** (tu appliques la configuration, étapes 1 à 8).
+
+Une seule délégation est autorisée dans toute la commande : la contre-lecture du
+besoin par **Devil** à l'étape 0d. Aucune autre. Les agents sont en cours de
+sélection — les invoquer pendant qu'on décide de leur sort n'aurait pas de sens,
+et la moitié d'entre eux n'existera plus dans dix minutes.
 
 Ta source de vérité unique est **`.claude/wizard/catalog.json`**. Tu ne
 codes en dur aucune liste d'agents, de commandes ou de hooks : tout vient du
@@ -25,13 +28,13 @@ cette commande, tu le traites comme les autres, sans exception.
 | Argument | Comportement |
 |----------|--------------|
 | *(vide)* | Wizard interactif complet, puis application après confirmation. |
-| `--check` | Valide la cohérence du catalogue et s'arrête. **Aucune modification.** |
-| `--dry-run` | Déroule tout le dialogue et affiche le plan, puis s'arrête. **Aucune modification.** |
-| `--reconfigure` | Repart de `.claude/wizard/state.json` : les réponses précédentes deviennent les valeurs par défaut. Permet d'ajouter un agent après coup. |
+| `--check` | Valide la cohérence du catalogue et s'arrête, **sans entretien**. Aucune modification. |
+| `--dry-run` | Déroule tout le dialogue, entretien de cadrage compris, et affiche le plan, puis s'arrête. **Aucune modification.** |
+| `--reconfigure` | Repart de `.claude/wizard/state.json`. L'entretien de cadrage est **allégé** : tu relis le cadrage archivé et demandes seulement ce qui a changé depuis. |
 
 ---
 
-## Étape 0 — Garde-fous (toujours, quel que soit le mode)
+## Pré-vol — Garde-fous (toujours, quel que soit le mode)
 
 1. Lis `.claude/wizard/catalog.json`. Absent ou illisible → **arrête-toi** et dis
    à l'utilisateur que le catalogue manque : sans lui le wizard n'a rien à appliquer.
@@ -62,10 +65,98 @@ verdict) puis **arrête-toi là**. Ne modifie rien.
 
 ---
 
+## Étape 0 — Entretien de cadrage
+
+C'est l'étape qui donne son sens à toutes les autres. Un profil d'équipe choisi
+sans comprendre le projet est un tirage au sort avec de jolis libellés.
+
+Tu mènes ici le **Temps 0** de la charte, appliqué au projet lui-même. Tu n'es
+pas en train de remplir un formulaire : tu conduis un entretien.
+
+### 0a — Le récit
+
+Commence par une seule question ouverte, et laisse l'utilisateur dérouler :
+
+> « Raconte-moi ce que tu veux construire — le problème que ça résout, pour qui,
+> et pourquoi maintenant. »
+
+N'enchaîne pas sur ta liste de questions. **Écoute la réponse d'abord**, et ne
+demande ensuite que ce qui manque réellement.
+
+### 0b — Les six zones d'ombre
+
+Lève les six zones définies dans `CLAUDE.md` § 2 — intention, usage, périmètre,
+contraintes, succès, échec. Groupe-les par quatre au maximum et propose des
+options chaque fois que c'est possible.
+
+Trois zones pèsent directement sur la composition de l'équipe. Ne les laisse pas
+ouvertes :
+
+| Zone | Ce qu'elle détermine |
+|------|----------------------|
+| **Usage** | Y a-t-il une interface utilisateur significative ? → Ergo, `/ux-review`. |
+| **Contraintes** | Données persistées, volumétrie, télémétrie ? → Data, `/data-review`. Réglementation, exposition réseau, données personnelles ? → Sentinel, threat model, politique de sécurité. |
+| **Périmètre** | Domaine métier spécialisé (industrie, IoT, OT) ? → Métier, `/domain-check`, conformité IEC 62443. |
+
+Tu poses ces questions **pour de vrai**, pas pour la forme : chacune retire ou
+ajoute des agents à l'étape 2.
+
+### 0c — Restitution
+
+Reformule le projet en cinq à dix lignes et fais **valider** à l'utilisateur.
+Tant que la restitution n'est pas validée, tu ne passes pas à l'étape suivante.
+
+### 0d — Contre-lecture par Devil
+
+C'est la seule délégation autorisée du wizard, et elle est **conditionnelle** :
+elle n'a lieu que si `.claude/agents/devil.md` existe encore (première
+initialisation : c'est le cas ; en `--reconfigure` sur un projet qui a retiré
+Devil : passe cette étape en le signalant).
+
+Transmets à Devil ta restitution, **et rien d'autre**, en lui demandant le
+format court du Temps 0 : intention non dite, scope qui enfle, hypothèse
+invérifiée, puis « le besoin tient / doit être recadré ».
+
+Arbitre sa sortie :
+
+- Point solide → repose-le à l'utilisateur **sous forme de question**, pas
+  d'objection. « Devil relève que rien ne garantit que les capteurs remontent en
+  temps réel — c'est vérifié de ton côté ? »
+- Point écarté → dis-le en une ligne dans ta synthèse. Jamais silencieusement.
+- « Le besoin doit être recadré » → **ne passe pas à l'étape 1**. Reprends
+  l'entretien sur la zone concernée. Un template configuré sur un besoin creux
+  est un template à refaire.
+
+### 0e — Politique d'élicitation
+
+Le cadrage que tu viens de mener est un cas particulier d'une règle permanente :
+**combien Pilote questionne avant de produire**, pour toute la vie du projet.
+
+Fais choisir cette politique avec `AskUserQuestion`, une option par entrée de
+`elicitationPolicies` dans le catalogue (`label` + `description`). Présélectionne
+celle désignée par `defaultElicitationPolicy`.
+
+Dis clairement ce qui se joue : cette politique gouvernera **chaque demande
+future**, pas seulement l'initialisation. Une politique `approfondi` sur un
+projet où l'utilisateur enchaîne les micro-corrections deviendra pesante ;
+`minimal` sur un projet mal cadré produira des livrables à côté de la plaque.
+`/init-project --reconfigure` permet d'en changer, dis-le aussi.
+
+> **Ce cadrage n'est pas persisté comme document vivant.** Il alimente
+> l'identité du projet (étape 1), le choix de profil (étape 2), et il est
+> archivé dans le rapport d'initialisation (étape 7.9). Si l'utilisateur veut un
+> brief produit maintenu dans la durée, c'est un livrable de Specia dans
+> `doc/functional/`, pas un artefact du wizard — propose-le sans l'imposer.
+
+---
+
 ## Étape 1 — Identité du projet
 
-Pose ces questions en texte libre (pas d'`AskUserQuestion`, ce sont des saisies
-ouvertes). Une seule fois, groupées, pour ne pas hacher le dialogue :
+Après l'entretien, la plupart de ces champs sont **déjà connus**. Ne les
+redemande pas : propose ce que tu as compris et fais corriger.
+
+Complète en texte libre ce qui manque encore (pas d'`AskUserQuestion`, ce sont
+des saisies ouvertes), en une seule fois pour ne pas hacher le dialogue :
 
 - **Nom du projet** (obligatoire).
 - **Stack principale** (ex. `Python/FastAPI`, `TypeScript/Next.js`, `C#/.NET 8`).
@@ -89,8 +180,16 @@ l'ordre où ils y figurent :
   qu'il sélectionne (ex. « 11 agents, 9 commandes, 3 hooks »).
 
 Ne code pas les profils en dur : s'il y en a plus de quatre dans le catalogue,
-présente les trois les plus proches du contexte décrit à l'étape 1 plus
+présente les trois les plus proches du contexte recueilli à l'étape 0 plus
 « Complet », et signale à l'utilisateur les profils non affichés.
+
+**Recommande explicitement un profil**, en justifiant par ce que l'entretien a
+révélé — « tu décris une UI significative et de la donnée persistée, donc
+web-app plutôt que solo ». Un wizard qui présente quatre options équivalentes
+sans avis n'a rien tiré de l'entretien qu'il vient de mener.
+
+Si aucun profil ne colle vraiment, dis-le : pars du plus proche et annonce que
+l'étape 3 servira à le corriger.
 
 ---
 
@@ -236,6 +335,7 @@ n'y touche pas — sauf pour retirer une règle qui référence un agent supprim
 | Zone | À régénérer |
 |------|-------------|
 | `identity` | Nom, stack, phase, description, langue des livrables (étape 1). |
+| `elicitation` | Le champ `rule` de la politique retenue à l'étape 0e, recopié **tel quel** depuis le catalogue. N'en réécris pas le texte. |
 | `team-table` | Table des agents retenus dont le tag contient `core`, avec Rôle / Posture / Modèle lus dans le catalogue. |
 | `specialists-table` | Table des agents retenus **sans** tag `core`. Si aucun, écris une ligne indiquant qu'aucun spécialiste n'est activé. |
 | `commands-table` | Commandes retenues au tag `core`. |
@@ -284,6 +384,14 @@ Vérifie que `runtime/` est bien ignoré par `.gitignore` ; sinon, ajoute-l'y.
   "catalogVersion": "<catalogVersion du catalogue>",
   "project": { "name": "…", "stack": "…", "phase": "…", "description": "…", "language": "…" },
   "profile": "<id du profil>",
+  "elicitationPolicy": "<id de la politique retenue à l'étape 0e>",
+  "framing": {
+    "problem": "<le problème résolu, une à deux phrases>",
+    "users": "<qui s'en sert et dans quel contexte>",
+    "outOfScope": "<ce qui a été explicitement écarté>",
+    "successCriteria": "<le critère observable de réussite>",
+    "devilVerdict": "<tient | recadré>, suivi du point retenu s'il y en a un"
+  },
   "selected": ["<ids retenus, triés>"],
   "removed": ["<ids écartés, triés>"],
   "hooksEnabled": ["<ids de hooks branchés>"],
@@ -299,9 +407,20 @@ Obtiens la date par `date -I` — ne l'invente pas.
 
 `doc/reviews/init-000-setup.md`, au format d'échange de la charte (§ 6) :
 auteur `Wizard`, posture `Arbitre`, date, contexte `Initialisation du template`.
-Contenu : profil retenu, composants écartés avec la raison (profil ou retrait
-explicite), avertissements de l'étape 6a, et les actions restant à la charge de
-l'utilisateur (variables d'environnement, politiques à compléter).
+Contenu, dans cet ordre :
+
+1. **Le cadrage** — ta restitution validée à l'étape 0c, mot pour mot. C'est la
+   seule trace durable de l'entretien : ne la résume pas une seconde fois.
+2. **La contre-lecture de Devil** — ses trois points et son verdict, puis ce que
+   tu as retenu ou écarté, avec la raison.
+3. **La configuration** — profil retenu et pourquoi, politique d'élicitation,
+   composants écartés avec leur raison (profil ou retrait explicite).
+4. **Les avertissements** de l'étape 6a.
+5. **Le reste à faire** — variables d'environnement, politiques à compléter.
+
+Ce rapport est daté et ne se réécrit pas : une reconfiguration ultérieure produit
+`init-001-…`, elle n'écrase pas celui-ci. L'historique du cadrage se lit dans la
+succession des rapports.
 
 ### 7.10 — Se retirer
 
@@ -343,7 +462,8 @@ effet qu'après redémarrage de la session.
 - **Jamais de suppression hors catalogue.** Un fichier que le catalogue ne
   référence pas n'est pas touché — c'est du travail utilisateur.
 - **Jamais de suppression d'un `removable: false`.**
-- **Pas de délégation.** Aucun `Task` : le wizard s'exécute en session principale.
+- **Une seule délégation.** Le `Task` vers Devil à l'étape 0d, et rien d'autre.
+  Tout le reste s'exécute en session principale.
 - **Cohérence terminale.** Après application, aucun fichier conservé ne doit
   référencer un composant supprimé. Relis les commandes retenues et corrige les
   mentions orphelines (un `/review-changes` qui convoque un Sentinel supprimé

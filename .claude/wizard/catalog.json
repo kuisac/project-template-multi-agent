@@ -3,7 +3,29 @@
   "//": "Catalogue des composants du template. Source de vérité unique de /init-project.",
   "//extend": "Pour ajouter un composant ou un profil, voir .claude/wizard/README.md.",
   "//mcp": "Les composants kind=mcp ne sont volontairement inclus dans aucun profil sauf full : /init-project les traite à part (étape 4), car ils dépendent de clés d'API et non du type de projet.",
-  "catalogVersion": "1.0.0",
+  "catalogVersion": "1.1.0",
+  "//elicitation": "Politique d'\u00e9change avec l'utilisateur AVANT toute production. Inject\u00e9e par /init-project dans la zone balis\u00e9e 'elicitation' de CLAUDE.md.",
+  "defaultElicitationPolicy": "approfondi",
+  "elicitationPolicies": [
+    {
+      "id": "minimal",
+      "label": "Minimal \u2014 un tour, puis hypoth\u00e8ses \u00e9crites",
+      "description": "Un seul tour de questions, quel que soit l'enjeu. Au-del\u00e0, Pilote avance sous hypoth\u00e8ses explicites.",
+      "rule": "**Politique d'\u00e9licitation : `minimal`.** Tu poses **un seul tour** de questions, group\u00e9 (quatre au maximum), sur les zones d'ombre les plus co\u00fbteuses. Ensuite tu produis, en \u00e9crivant **en t\u00eate du livrable** les hypoth\u00e8ses que tu as d\u00fb prendre. Chaque hypoth\u00e8se est une phrase v\u00e9rifiable, pas une pr\u00e9caution vague : \u00ab je suppose que le volume ne d\u00e9passe pas 10 000 mesures/jour \u00bb, pas \u00ab sous r\u00e9serve du contexte \u00bb. C'est \u00e0 l'utilisateur de corriger ce qui est faux."
+    },
+    {
+      "id": "gradue",
+      "label": "Gradu\u00e9 \u2014 index\u00e9 sur l'\u00e9chelle L1\u2013L5",
+      "description": "La profondeur de l'entretien suit le niveau de structurance de la charte.",
+      "rule": "**Politique d'\u00e9licitation : `gradu\u00e9`.** La profondeur de l'entretien suit le niveau de structurance (cf. `team-charter.md` \u00a7 4) : **L1\u2013L2** \u2014 aucune question, tu agis ; **L3** \u2014 un tour group\u00e9 avant de produire ; **L4\u2013L5** \u2014 entretien complet jusqu'\u00e0 ce que les six zones d'ombre soient lev\u00e9es. En cas de doute sur le niveau, prends le niveau sup\u00e9rieur : sur-questionner co\u00fbte une minute, sous-questionner co\u00fbte une it\u00e9ration."
+    },
+    {
+      "id": "approfondi",
+      "label": "Approfondi \u2014 entretien syst\u00e9matique",
+      "description": "Rien ne se construit sur un besoin flou. Entretien avant toute production, quel que soit l'enjeu apparent.",
+      "rule": "**Politique d'\u00e9licitation : `approfondi`.** Tu m\u00e8nes un entretien **avant toute production**, quel que soit l'enjeu apparent de la demande. Une demande qui te semble triviale est une demande dont tu n'as pas encore vu l'enjeu : c'est pr\u00e9cis\u00e9ment l\u00e0 que les malentendus co\u00fbtent le plus cher, parce que personne ne les cherche. Tu ne produis rien \u2014 pas une ligne de code, pas une spec, pas un ADR \u2014 tant que les six zones d'ombre ne sont pas lev\u00e9es ou explicitement assum\u00e9es par l'utilisateur.\n\n> **Ce que \u00ab production \u00bb ne couvre pas.** R\u00e9pondre \u00e0 une question sur le code existant, lire un fichier, expliquer un fonctionnement, chercher dans le d\u00e9p\u00f4t : ce sont des actes de **lecture**, ils ne demandent aucun entretien. L'entretien pr\u00e9c\u00e8de l'\u00e9criture, pas la conversation."
+    }
+  ],
 
   "tags": {
     "core": "Socle indispensable au fonctionnement de l'équipe adversariale.",

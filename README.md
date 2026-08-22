@@ -56,6 +56,12 @@
    du template si tu veux repartir d'un dépôt vierge.
 2. **Lancer Claude Code** dans le répertoire racine.
 3. **Lancer `/init-project`** — le wizard fait le reste :
+   - il **mène un entretien de cadrage** : le problème résolu, pour qui, ce qui
+     est hors sujet, les contraintes, le critère de réussite — puis il te restitue
+     ce qu'il a compris et **fait contre-lire le besoin par Devil** avant d'aller
+     plus loin ;
+   - il te fait choisir la **politique d'élicitation** du projet : combien Claude
+     te questionne avant de produire, pour toute la vie du projet ;
    - il renseigne l'identité du projet (nom, stack, phase, description) ;
    - il te fait choisir un **profil** (solo, web/SaaS, industrie-IoT, data, complet) ;
    - il te laisse **ajuster à la carte** les agents, commandes et hooks ;
@@ -73,6 +79,34 @@
 > Besoin d'ajouter un agent trois semaines plus tard ? `/init-project --reconfigure`
 > repart de tes réponses précédentes.
 <!-- wizard:end quickstart -->
+
+---
+
+## Comment Claude te parle
+
+Le template ne se contente pas d'organiser le débat **entre agents** : il cadre
+aussi l'échange **entre toi et Claude**. Une demande n'est pas une spécification,
+et l'essentiel des livrables ratés le sont pour avoir répondu trop vite à une
+demande mal comprise.
+
+Avant toute production, Pilote mène un **entretien de besoin** (le « Temps 0 » de
+la charte) qui lève six zones d'ombre : intention, usage, périmètre, contraintes,
+critère de succès, scénario d'échec. Il restitue ce qu'il a compris, le fait
+valider, puis **Devil contre-lit le besoin** — pas la solution : une intention non
+dite, un scope qui enfle, une hypothèse invérifiée.
+
+La **profondeur** de cet entretien est un paramètre du projet, choisi à
+l'initialisation parmi trois politiques :
+
+| Politique | Ce qu'elle impose |
+|-----------|-------------------|
+| `minimal` | Un tour de questions, puis production sous hypothèses écrites en tête du livrable. |
+| `gradue` | La profondeur suit le niveau L1–L5 : rien sur du trivial, entretien complet sur du structurant. |
+| `approfondi` | Entretien systématique avant toute production. **Défaut du template.** |
+
+La politique retenue est inscrite dans la zone `elicitation` de `CLAUDE.md` et se
+change avec `/init-project --reconfigure`. Le détail de la doctrine — les six
+zones, comment questionner, quand s'arrêter — est dans `CLAUDE.md` § 2.
 
 ---
 

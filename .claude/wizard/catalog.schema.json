@@ -25,6 +25,16 @@
       "type": "array",
       "minItems": 1,
       "items": { "$ref": "#/$defs/profile" }
+    },
+    "defaultElicitationPolicy": {
+      "type": "string",
+      "description": "Id de la politique appliquee par defaut. Doit designer une entree de elicitationPolicies."
+    },
+    "elicitationPolicies": {
+      "type": "array",
+      "description": "Politiques d'echange avec l'utilisateur avant production. /init-project en fait choisir une et injecte son champ 'rule' dans la zone balisee 'elicitation' de CLAUDE.md.",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/elicitationPolicy" }
     }
   },
   "$defs": {
@@ -126,6 +136,20 @@
           "then": { "required": ["role", "posture", "model"] }
         }
       ]
+    },
+    "elicitationPolicy": {
+      "type": "object",
+      "required": ["id", "label", "description", "rule"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "label": { "type": "string", "description": "Libelle propose dans le choix de politique." },
+        "description": { "type": "string", "description": "Une ou deux phrases : ce que la politique impose." },
+        "rule": {
+          "type": "string",
+          "description": "Texte Markdown injecte tel quel dans la zone balisee 'elicitation' de CLAUDE.md. Redige a la deuxieme personne, adresse a Pilote."
+        }
+      }
     },
     "profile": {
       "type": "object",

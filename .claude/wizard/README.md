@@ -116,6 +116,34 @@ branché ; l'utilisateur l'active pendant le dialogue ou plus tard à la main.
 `paths` liste ce qui est supprimé **avec** le serveur si l'utilisateur choisit de
 le retirer plutôt que de le désactiver.
 
+## Ajouter ou modifier une politique d'élicitation
+
+`elicitationPolicies` décrit **combien Claude questionne l'utilisateur avant de
+produire**. C'est le seul réglage du catalogue qui ne porte pas sur des fichiers
+mais sur un comportement.
+
+```json
+{
+  "id": "prototype",
+  "label": "Prototype — construire pour faire réagir",
+  "description": "Sur un besoin flou, une maquette jetable vaut mieux qu'un questionnaire.",
+  "rule": "**Politique d'élicitation : `prototype`.** Tu poses au plus deux questions, puis tu construis la plus petite chose montrable…"
+}
+```
+
+Le champ `rule` est du Markdown **injecté tel quel** par l'étape 7.4 du wizard
+dans la zone balisée `elicitation` de `CLAUDE.md`. Rédige-le à la deuxième
+personne, adressé à Pilote — c'est lui qui le lira à chaque session.
+
+`defaultElicitationPolicy` désigne la politique présélectionnée pendant le
+dialogue. Elle doit correspondre à un `id` existant, sans quoi
+`/init-project --check` échoue.
+
+> Les six zones d'ombre, elles, ne sont **pas** paramétrables : elles vivent dans
+> `CLAUDE.md` § 2, hors zone balisée, parce qu'elles relèvent de la doctrine du
+> projet et non de sa configuration. Une politique règle la *profondeur* de
+> l'entretien, jamais ce qu'on y cherche.
+
 ## Ajouter un profil
 
 Un profil n'est qu'une liste d'ids. Deux invariants, tous deux vérifiés par

@@ -37,6 +37,11 @@ Optimise pour : **trouver ce qui ne va pas avant l'utilisateur ou l'attaquant**.
 
 Membres : Critik (code), Sentinel (sécurité), Devil (produit & valeur).
 
+**Devil intervient à deux moments distincts** : au **Temps 0** pour contredire le
+besoin exprimé (format court, trois points), et aux **Temps 2** pour challenger
+une proposition constituée (format complet, avec premortem). Ne confonds pas les
+deux — le premier n'a pas de feature à enterrer.
+
 ### 2.4. Posture mixte
 
 Certains agents jouent les deux rôles selon le contexte. À ce jour : **Ergo**
@@ -45,13 +50,38 @@ quand il challenge l'utilisabilité d'une proposition existante.
 
 ---
 
-## 3. Les trois temps du débat
+## 3. Les temps du débat
 
 Tout sujet structurant suit ce rythme. **Pas de raccourci**.
 
+### Temps 0 — Élicitation (Arbitre, contredit par Devil)
+
+**Préalable universel.** Il ne fait pas partie du cycle adversarial : il le
+précède, et il s'applique quel que soit le niveau de structurance. On ne débat
+pas d'une solution avant de s'être mis d'accord sur le problème.
+
+Pilote mène l'entretien avec l'utilisateur et lève six zones d'ombre —
+intention, usage, périmètre, contraintes, succès, échec (le détail est dans
+`CLAUDE.md` § 2). Il en tire une **restitution de cinq à dix lignes** qu'il fait
+valider par l'utilisateur.
+
+Devil contre-lit alors le **besoin**, pas la solution : une intention non dite,
+un scope qui enfle, une hypothèse invérifiée. Pilote arbitre ce qu'il repose en
+question à l'utilisateur.
+
+La profondeur de l'entretien est fixée par la **politique d'élicitation** du
+projet, déclarée dans la zone `elicitation` de `CLAUDE.md` et modifiable via
+`/init-project --reconfigure`.
+
+> **Ce temps peut se conclure par un refus de construire.** Si le besoin ne
+> tient pas, la bonne sortie est de le dire, pas d'enchaîner sur le Temps 1. Un
+> cycle adversarial mené sur un besoin creux produit une décision bien argumentée
+> à propos de rien.
+
 ### Temps 1 — Proposition (Constructeur)
 
-L'agent constructeur compétent rédige une proposition courte :
+L'agent constructeur compétent rédige une proposition courte. Il part de la
+restitution issue du Temps 0 — pas de la demande brute de l'utilisateur :
 - Problème, contraintes, hypothèses.
 - Solution proposée + alternatives écartées (avec justification).
 - Impacts : code, tests, doc, sécurité, exploitation.
@@ -75,6 +105,10 @@ L'arbitre :
 ---
 
 ## 4. Niveaux de structurance
+
+Le **Temps 0 (élicitation)** précède tous les niveaux sans exception — c'est ce
+qui distingue une demande comprise d'une demande exécutée. Les procédures
+ci-dessous décrivent ce qui vient **après** lui.
 
 | Niveau | Exemples | Procédure |
 |--------|----------|-----------|
